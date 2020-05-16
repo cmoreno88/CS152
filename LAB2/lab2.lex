@@ -1,8 +1,9 @@
 /* 
  * Christopher Moreno
- * CS152 LAB_1
+ * CS152 LAB_2
  * Description: Lexical Analyzer for the Mini-L language 
- *              
+ *This is an example provided by the TA 
+ *  
  * Usage: (1) $ flex lab1.lex
  *        (2) $ gcc -o lab1 lex.yy.c -lfl
  *        (3) $ ./lab1
@@ -20,56 +21,33 @@
  * USER CODE
  */
 
-%{
-	int cur_line = 1;
-	int cur_pos = 1;
-	int numInts = 0;
-	int numOps = 0;
-	int numParens = 0;
-	int numEquals = 0;
+%{   
+   #include "y.tab.h"
+   int currLine = 1, currPos = 1;
+   int numNumbers = 0;
+   int numOperators = 0;
+   int numParens = 0;
+   int numEquals = 0;
 %}
 
-DIGIT	[0-9]
-
+DIGIT    [0-9]
+   
 %%
 
-"-"		{printf("MINUS\n"); cur_pos += yyleng; numOps++;}
-"+"		{printf("PLUS\n"); cur_pos += yyleng; numOps++;}
-"*"		{printf("MULT\n"); cur_pos += yyleng; numOps++;}
-"/"		{printf("DIV\n"); cur_pos += yyleng; numOps++;}
-"="		{printf("EQUAL\n"); cur_pos += yyleng; numEquals++;}
-"("		{printf("L_PAREN\n"); cur_pos += yyleng; numParens++;}
-")"		{printf("R_PAREN\n"); cur_pos += yyleng; numParens++;}
+"-"            {currPos += yyleng; numOperators++; return MINUS;}
+"+"            {currPos += yyleng; numOperators++; return PLUS;}
+"*"            {currPos += yyleng; numOperators++; return MULT;}
+"/"            {currPos += yyleng; numOperators++; return DIV;}
+"="            {currPos += yyleng; numEquals++; return EQUAL;}
+"("            {currPos += yyleng; numParens++; return L_PAREN;}
+")"            {currPos += yyleng; numParens++; return R_PAREN;}
 
-(\.{DIGIT}+)|({DIGIT}+(\.{DIGIT}*)?([eE][+-]?[0-9]+)?)	{printf("NUMBER %s\n", yytext); cur_pos += yyleng; numInts++;}
+(\.{DIGIT}+)|({DIGIT}+(\.{DIGIT}*)?([eE][+-]?[0-9]+)?)   {currPos += yyleng; yylval.dval = atof(yytext); numNumbers++; return NUMBER;}
 
-[ \t]+		{/* ignore spaces */ cur_pos += yyleng;}
+[ \t]+         {/* ignore spaces */ currPos += yyleng;}
 
-"\n"		{cur_line++; cur_pos = 1;}
+"\n"           {currLine++; currPos = 1; return END;}
 
-.			{printf("Error at line %d, column %d: unrecognized symbol \"%s\"\n",
-cur_line, cur_pos, yytext); exit(0);}
+.              {printf("Error at line %d, column %d: unrecognized symbol \"%s\"\n", currLine, currPos, yytext); exit(0);}
 
 %%
-
-int main(int argc, char ** argv)
-{
-	if(argc >= 2)
-	{
-		yyin = fopen(argv[1], "r");
-		if(yyin == NULL)
-		{
-			yyin = stdin;
-		}
-	}
-	else
-	{
-		yyin = stdin;
-	}
-	yylex();
-	
-	printf("Number of Integers: %d\n", numInts);
-	printf("Number of Opertors: %d\n", numOps);
-	printf("Number of Parenthesis: %d\n", numParens);
-	printf("Number of Equals: %d\n", numEquals);
-}
