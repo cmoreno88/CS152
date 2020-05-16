@@ -58,8 +58,8 @@ program:	 			functions {printf("program-> functions\n");}
 functions: 				/*epsilon*/ {printf("functions-> epsilon\n");}
 						| function functions {printf("functions-> function functions\n");}
 
-function: 				FUNCTION IDENT SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statements END_BODY
-						{printf("function-> FUNCTION IDENT %s SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statements END_BODY\n", $2);}
+function: 				FUNCTION identifier SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statements END_BODY
+						{printf("function-> FUNCTION identifier SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statements END_BODY\n");}
 			
 declarations:			/*epsilon*/ {printf("declarations-> epsilon\n");}
 						| declaration SEMICOLON declarations {printf("declarations-> declaration SEMICOLON declorations\n");}
@@ -76,33 +76,72 @@ statements:				statement SEMICOLON statements {printf("statements-> statement SE
 
 
 
-statement:				var ASSIGN expression {printf("statement-> var ASSIGN expression"\n);}
+statement:				vars ASSIGN expressions {printf("statement-> var ASSIGN expressions"\n);}
 						| IF bool-expr THEN statements ENDIF {printf("statement-> IF bool-expr THEN statements ENDIF\n");}
 						| IF bool-expr THEN statements ELSE statements ENDIF {printf("statement-> IF bool-expr THEN statements ELSE statements ENDIF\n");}
 						| WHILE bool-expr BEGINLOOP statements ENDLOOP {printf("statement->WHILE bool-expr BEGINLOOP statements ENDLOOP\n");}
 						| DO BEGINLOOP statements ENDLOOP WHILE bool-expr {printf("statement->DO BEGINLOOP statements ENDLOOP WHILE bool-expr");}
-						| FOR var ASSIGN NUMBER SEMICOLON bool-expr SEMICOLON var ASSIGN expression BEGINLOOP statements ENDLOOP {printf("statements-> FOR var ASSIGN NUMBER SEMICOLON bool-expr SEMICOLON var ASSIGN expression BEGINLOOP statements ENDLOOP");}
-/*PICK UP HEREXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
-						| READ var
+						| FOR vars ASSIGN NUMBER SEMICOLON bool-expr SEMICOLON vars ASSIGN expressions BEGINLOOP statements ENDLOOP {printf("statements-> FOR vars ASSIGN NUMBER SEMICOLON bool-expr SEMICOLON vars ASSIGN expressions BEGINLOOP statements ENDLOOP");}
+						| READ vars {printf("statement->READ vars\n");}
+						| WRITE vars {printf("statement->WRITE vars\n");}
+						| CONTINUE {printf("statement->CONTINUE\n");}
+						| RETURN expressions {printf("statement->RETURN expressions\n");}
 
+vars:					var COMMA vars {printf("vars->var COMMA vars")}
+						| var {printf("vars->var\n");}
 
-var:					IDENT
-						{printf("var->IDENT %s\n", $1);}
+var:					identifier {printf("var->identifier\n");}
+						| identifier L_SQUARE_BRACKET expressions R_SQUARE_BRACKET {printf("var->identifier L_SQUARE_BRACKET expressions R_SQUARE_BRACKET");}
+						| identifier L_SQUARE_BRACKET expressions R_SQUARE_BRACKET L_SQUARE_BRACKET expressions R_SQUARE_BRACKET {printf("var->identifier L_SQUARE_BRACKET expressions R_SQUARE_BRACKET L_SQUARE_BRACKET expressions R_SQUARE_BRACKET");}
+
+comp:					EQ {printf("comp->EQ\n");}
+						| NEQ {printf("comp->NEQ\n");}
+						| LT {printf("comp->LT\n");}
+						| GT {printf("comp->GT\n");}
+						| LTE {printf("comp->LTE\n");}
+						| GTE {printf("comp->GTE\n");}
+
+expressions:			/*epsilon*/ {printf("expressions->epsilon\n");}
+						| expression {printf("expressions->expression\n");}
+						| expression COMMA expressions {printf("expressions->expression COMMA expressions\n");} 
 				
-expression:				/*epsilon*/ {printf("expression->epsilon\n");}
+expression:				multiplicative-expr {printf("expression->multiplicative-expr\n");}
+						| multiplicative-expr ADD expression {printf("expression->multiplicative-expr ADD expression\n");}
+						| multiplicative-expr SUB expression {printf("expression->multiplicative-expr SUB expression\n");}
+
 				
-bool-expr:				
+bool-expr:				relation-and-expr {printf("bool-expr->relation-and-expr\n");}
+						| relation-and-expr OR bool-expr {printf("bool-expr->relation-and-expr OR bool-expr\n");}
 
-relation-and-expr:		
+relation-and-expr:		relation-expr {printf("relation-and-expr->relation-expr\n");}
+						|relation-expr AND relation-and-expr {printf("relation-and-expr->relation-expr AND relation-and-expr\n");}
 
-relation-expr:			
+relation-expr:			expression comp expression {printf("realtion-expr->expression comp expression\n");}
+						| TRUE {printf("realtion-expr->TRUE\n");}
+						| FALSE {printf("realtion-expr->FALSE\n");}
+						| identifier L_PAREN bool-expr R_PAREN {printf("realtion-expr->identifier L_PAREN bool-expr R_PAREN\n");}
+						| NOT expression comp expression {printf("realtion-expr->NOT expression comp expression\n");}
+						| NOT TRUE {printf("realtion-expr->NOT TRUE\n");}
+						| NOT FALSE {printf("realtion-expr->NOT FALSE\n");}
+						| NOT identifier L_PAREN bool-expr R_PAREN {printf("realtion-expr->NOT identifier L_PAREN bool-expr R_PAREN\n");}
 
-comp:					
 
-multiplicative-expr:	
+multiplicative-expr:	term {printf("multiplicative-expr->term\n");}
+						| term MULT multiplicative-expr {printf("multiplicative-expr->term MULT multiplicative-expr\n");}
+						| term DIV multiplicative-expr {printf("multiplicative-expr->term DIV multiplicative-expr\n");}
+						| term MOD multiplicative-expr {printf("multiplicative-expr->term MOD multiplicative-expr\n");}
 
-term:					
-				
+term:					var {printf("term->vars\n");}
+						| SUB var {printf("term->SUB vars\n");}
+						| NUMBER {printf("term->NUMBER %d\n", $1);}
+						| SUB NUMBER {printf("term->SUB NUMBER %d\n", $2);}
+						| L_PAREN expression R_PAREN{printf("term->L_PAREN expression R_PAREN\n");}
+						| SUB L_PAREN expression R_PAREN {printf("term->SUB L_PAREN expression R_PAREN\n");}
+						| identifier L_PAREN expressions R_PAREN {printf("identifier L_PAREN expressions R_PAREN\n");}
+						
+						
+						
+						
 identifier:				IDENT {printf("identifier->IDENT %s\n", $1);}
 						| IDENT COMMA identifier {printf("identifier->IDENT %s COMMA identifier", $1);}
 			
