@@ -58,15 +58,22 @@ program: 		functions {printf("program->functions\n");}
 functions: 		/*epsilon*/ {printf("functions->epsilon\n");}
 				| function functions {printf("functions->function functions\n");}
 
-function: 		FUNCTION IDENT SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY
-				{printf("function->FUNCTION IDENT %s SEMICOLON\n", $2);}
+function: 		FUNCTION IDENT SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statement SEMICOLON END_BODY
+				{printf("function->FUNCTION IDENT %s SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statement SEMICOLON END_BODY\n", $2);}
 			
-declarations:	/*epsilon*/ {printf("declarations->epsilon\n");}			
+declarations:	/*epsilon*/ {printf("declarations->epsilon\n");}
+				| declaration SEMICOLON declarations {printf("declarations->declaration SEMICOLON declorations\n");}
+				
+declaration:	IDENT COLON INTEGER {printf("IDENT %s COMMA COLON INTEGER\n"), $1;}
 			
+statement:		var ASSIGN expression {printf("statement->var ASSIGN expression");}
+
 var:			IDENT
-				{printf("var->IDENT%s\n", $1);}
+				{printf("var->IDENT %s\n", $1);}
+				
+expression:		/*epsilon*/ {printf("expression->epsilon\n");}
+				
 			
-statement:		
 %%
 
 

@@ -428,16 +428,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  6
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   4
+#define YYLAST   22
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  52
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  4
+#define YYNNTS  9
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  5
+#define YYNRULES  11
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  9
+#define YYNSTATES  29
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
@@ -488,7 +488,8 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    54,    54,    56,    57,    59
+       0,    56,    56,    58,    59,    61,    64,    65,    67,    69,
+      71,    74
 };
 #endif
 
@@ -505,7 +506,8 @@ static const char *const yytname[] =
   "L_PAREN", "R_PAREN", "AND", "OR", "L_SQUARE_BRACKET",
   "R_SQUARE_BRACKET", "MULT", "DIV", "MOD", "ADD", "SUB", "LT", "LTE",
   "GT", "GTE", "EQ", "NEQ", "ASSIGN", "NOT", "$accept", "program",
-  "functions", "function", YY_NULLPTR
+  "functions", "function", "declarations", "declaration", "statement",
+  "var", "expression", YY_NULLPTR
 };
 #endif
 
@@ -523,10 +525,10 @@ static const yytype_uint16 yytoknum[] =
 };
 # endif
 
-#define YYPACT_NINF -6
+#define YYPACT_NINF -35
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-6)))
+  (!!((Yystate) == (-35)))
 
 #define YYTABLE_NINF -1
 
@@ -537,7 +539,9 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -5,    -2,     2,    -6,    -5,    -3,    -6,    -6,    -6
+      -4,     0,     4,   -35,    -4,    -1,   -35,   -35,    -3,     3,
+     -23,    -2,     5,    -6,     1,     3,   -35,     3,   -35,     2,
+       6,     9,   -35,     8,   -34,     7,   -35,   -35,   -35
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -545,19 +549,21 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       3,     0,     0,     2,     3,     0,     1,     4,     5
+       3,     0,     0,     2,     3,     0,     1,     4,     0,     6,
+       0,     0,     0,     0,     0,     6,     8,     6,     7,     0,
+       0,     0,    10,     0,     0,     0,    11,     5,     9
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -6,    -6,     0,    -6
+     -35,   -35,    13,   -35,   -15,   -35,   -35,   -35,   -35
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     2,     3,     4
+      -1,     2,     3,     4,    11,    12,    23,    24,    28
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -565,31 +571,39 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-       1,     5,     6,     8,     7
+      18,     1,    19,     5,     6,     8,    10,     9,    13,    14,
+      16,    15,    22,    17,    25,    20,    26,     7,     0,     0,
+      21,     0,    27
 };
 
-static const yytype_uint8 yycheck[] =
+static const yytype_int8 yycheck[] =
 {
-       5,     3,     0,     6,     4
+      15,     5,    17,     3,     0,     6,     3,    10,    31,    11,
+      16,     6,     3,    12,     6,    13,    50,     4,    -1,    -1,
+      14,    -1,    15
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     5,    53,    54,    55,     3,     0,    54,     6
+       0,     5,    53,    54,    55,     3,     0,    54,     6,    10,
+       3,    56,    57,    31,    11,     6,    16,    12,    56,    56,
+      13,    14,     3,    58,    59,     6,    50,    15,    60
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    52,    53,    54,    54,    55
+       0,    52,    53,    54,    54,    55,    56,    56,    57,    58,
+      59,    60
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     1,     0,     2,     3
+       0,     2,     1,     0,     2,    13,     0,     3,     3,     3,
+       1,     0
 };
 
 
@@ -1266,31 +1280,67 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 54 "mini_l.y" /* yacc.c:1646  */
+#line 56 "mini_l.y" /* yacc.c:1646  */
     {printf("program->functions\n");}
-#line 1272 "y.tab.c" /* yacc.c:1646  */
+#line 1286 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 56 "mini_l.y" /* yacc.c:1646  */
+#line 58 "mini_l.y" /* yacc.c:1646  */
     {printf("functions->epsilon\n");}
-#line 1278 "y.tab.c" /* yacc.c:1646  */
+#line 1292 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 57 "mini_l.y" /* yacc.c:1646  */
+#line 59 "mini_l.y" /* yacc.c:1646  */
     {printf("functions->function functions\n");}
-#line 1284 "y.tab.c" /* yacc.c:1646  */
+#line 1298 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 59 "mini_l.y" /* yacc.c:1646  */
-    {printf("function->FUNCTION IDENT %s SEMICOLON\n", (yyvsp[-1].cVal));}
-#line 1290 "y.tab.c" /* yacc.c:1646  */
+#line 62 "mini_l.y" /* yacc.c:1646  */
+    {printf("function->FUNCTION IDENT %s SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statement SEMICOLON END_BODY\n", (yyvsp[-11].cVal));}
+#line 1304 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 6:
+#line 64 "mini_l.y" /* yacc.c:1646  */
+    {printf("declarations->epsilon\n");}
+#line 1310 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 7:
+#line 65 "mini_l.y" /* yacc.c:1646  */
+    {printf("declarations->declaration SEMICOLON declorations\n");}
+#line 1316 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 8:
+#line 67 "mini_l.y" /* yacc.c:1646  */
+    {printf("IDENT %s COMMA COLON INTEGER\n"), (yyvsp[-2].cVal);}
+#line 1322 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 9:
+#line 69 "mini_l.y" /* yacc.c:1646  */
+    {printf("statement->var ASSIGN expression");}
+#line 1328 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 10:
+#line 72 "mini_l.y" /* yacc.c:1646  */
+    {printf("var->IDENT %s\n", (yyvsp[0].cVal));}
+#line 1334 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 11:
+#line 74 "mini_l.y" /* yacc.c:1646  */
+    {printf("expression->epsilon\n");}
+#line 1340 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1294 "y.tab.c" /* yacc.c:1646  */
+#line 1344 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1518,7 +1568,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 60 "mini_l.y" /* yacc.c:1906  */
+#line 77 "mini_l.y" /* yacc.c:1906  */
 
 
 

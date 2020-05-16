@@ -4,13 +4,6 @@ Terminals unused in grammar
    TRUE
    FALSE
    RETURN
-   BEGIN_PARAMS
-   END_PARAMS
-   BEGIN_LOCALS
-   END_LOCALS
-   BEGIN_BODY
-   END_BODY
-   INTEGER
    ARRAY
    OF
    IF
@@ -25,7 +18,6 @@ Terminals unused in grammar
    CONTINUE
    READ
    WRITE
-   COLON
    COMMA
    L_PAREN
    R_PAREN
@@ -44,7 +36,6 @@ Terminals unused in grammar
    GTE
    EQ
    NEQ
-   ASSIGN
    NOT
 
 
@@ -57,27 +48,38 @@ Grammar
     2 functions: %empty
     3          | function functions
 
-    4 function: FUNCTION IDENT SEMICOLON
+    4 function: FUNCTION IDENT SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statement SEMICOLON END_BODY
+
+    5 declarations: %empty
+    6             | declaration SEMICOLON declarations
+
+    7 declaration: IDENT COLON INTEGER
+
+    8 statement: var ASSIGN expression
+
+    9 var: IDENT
+
+   10 expression: %empty
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
 error (256)
-IDENT (258) 4
+IDENT (258) 4 7 9
 NUMBER (259)
 FUNCTION (260) 4
-SEMICOLON (261) 4
+SEMICOLON (261) 4 6
 TRUE (262)
 FALSE (263)
 RETURN (264)
-BEGIN_PARAMS (265)
-END_PARAMS (266)
-BEGIN_LOCALS (267)
-END_LOCALS (268)
-BEGIN_BODY (269)
-END_BODY (270)
-INTEGER (271)
+BEGIN_PARAMS (265) 4
+END_PARAMS (266) 4
+BEGIN_LOCALS (267) 4
+END_LOCALS (268) 4
+BEGIN_BODY (269) 4
+END_BODY (270) 4
+INTEGER (271) 7
 ARRAY (272)
 OF (273)
 IF (274)
@@ -92,7 +94,7 @@ ENDLOOP (282)
 CONTINUE (283)
 READ (284)
 WRITE (285)
-COLON (286)
+COLON (286) 7
 COMMA (287)
 L_PAREN (288)
 R_PAREN (289)
@@ -111,7 +113,7 @@ GT (301)
 GTE (302)
 EQ (303)
 NEQ (304)
-ASSIGN (305)
+ASSIGN (305) 8
 NOT (306)
 
 
@@ -125,6 +127,16 @@ functions (54)
     on left: 2 3, on right: 1 3
 function (55)
     on left: 4, on right: 3
+declarations (56)
+    on left: 5 6, on right: 4 6
+declaration (57)
+    on left: 7, on right: 6
+statement (58)
+    on left: 8, on right: 4
+var (59)
+    on left: 9, on right: 8
+expression (60)
+    on left: 10, on right: 8
 
 
 State 0
@@ -142,7 +154,7 @@ State 0
 
 State 1
 
-    4 function: FUNCTION . IDENT SEMICOLON
+    4 function: FUNCTION . IDENT SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statement SEMICOLON END_BODY
 
     IDENT  shift, and go to state 5
 
@@ -175,7 +187,7 @@ State 4
 
 State 5
 
-    4 function: FUNCTION IDENT . SEMICOLON
+    4 function: FUNCTION IDENT . SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statement SEMICOLON END_BODY
 
     SEMICOLON  shift, and go to state 8
 
@@ -196,6 +208,166 @@ State 7
 
 State 8
 
-    4 function: FUNCTION IDENT SEMICOLON .
+    4 function: FUNCTION IDENT SEMICOLON . BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statement SEMICOLON END_BODY
+
+    BEGIN_PARAMS  shift, and go to state 9
+
+
+State 9
+
+    4 function: FUNCTION IDENT SEMICOLON BEGIN_PARAMS . declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statement SEMICOLON END_BODY
+
+    IDENT  shift, and go to state 10
+
+    $default  reduce using rule 5 (declarations)
+
+    declarations  go to state 11
+    declaration   go to state 12
+
+
+State 10
+
+    7 declaration: IDENT . COLON INTEGER
+
+    COLON  shift, and go to state 13
+
+
+State 11
+
+    4 function: FUNCTION IDENT SEMICOLON BEGIN_PARAMS declarations . END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statement SEMICOLON END_BODY
+
+    END_PARAMS  shift, and go to state 14
+
+
+State 12
+
+    6 declarations: declaration . SEMICOLON declarations
+
+    SEMICOLON  shift, and go to state 15
+
+
+State 13
+
+    7 declaration: IDENT COLON . INTEGER
+
+    INTEGER  shift, and go to state 16
+
+
+State 14
+
+    4 function: FUNCTION IDENT SEMICOLON BEGIN_PARAMS declarations END_PARAMS . BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statement SEMICOLON END_BODY
+
+    BEGIN_LOCALS  shift, and go to state 17
+
+
+State 15
+
+    6 declarations: declaration SEMICOLON . declarations
+
+    IDENT  shift, and go to state 10
+
+    $default  reduce using rule 5 (declarations)
+
+    declarations  go to state 18
+    declaration   go to state 12
+
+
+State 16
+
+    7 declaration: IDENT COLON INTEGER .
+
+    $default  reduce using rule 7 (declaration)
+
+
+State 17
+
+    4 function: FUNCTION IDENT SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS . declarations END_LOCALS BEGIN_BODY statement SEMICOLON END_BODY
+
+    IDENT  shift, and go to state 10
+
+    $default  reduce using rule 5 (declarations)
+
+    declarations  go to state 19
+    declaration   go to state 12
+
+
+State 18
+
+    6 declarations: declaration SEMICOLON declarations .
+
+    $default  reduce using rule 6 (declarations)
+
+
+State 19
+
+    4 function: FUNCTION IDENT SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations . END_LOCALS BEGIN_BODY statement SEMICOLON END_BODY
+
+    END_LOCALS  shift, and go to state 20
+
+
+State 20
+
+    4 function: FUNCTION IDENT SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS . BEGIN_BODY statement SEMICOLON END_BODY
+
+    BEGIN_BODY  shift, and go to state 21
+
+
+State 21
+
+    4 function: FUNCTION IDENT SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY . statement SEMICOLON END_BODY
+
+    IDENT  shift, and go to state 22
+
+    statement  go to state 23
+    var        go to state 24
+
+
+State 22
+
+    9 var: IDENT .
+
+    $default  reduce using rule 9 (var)
+
+
+State 23
+
+    4 function: FUNCTION IDENT SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statement . SEMICOLON END_BODY
+
+    SEMICOLON  shift, and go to state 25
+
+
+State 24
+
+    8 statement: var . ASSIGN expression
+
+    ASSIGN  shift, and go to state 26
+
+
+State 25
+
+    4 function: FUNCTION IDENT SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statement SEMICOLON . END_BODY
+
+    END_BODY  shift, and go to state 27
+
+
+State 26
+
+    8 statement: var ASSIGN . expression
+
+    $default  reduce using rule 10 (expression)
+
+    expression  go to state 28
+
+
+State 27
+
+    4 function: FUNCTION IDENT SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statement SEMICOLON END_BODY .
 
     $default  reduce using rule 4 (function)
+
+
+State 28
+
+    8 statement: var ASSIGN expression .
+
+    $default  reduce using rule 8 (statement)
