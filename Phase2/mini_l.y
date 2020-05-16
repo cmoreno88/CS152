@@ -53,26 +53,58 @@ same way we did with program->functions->function
 */
 
 %%
-program: 		functions {printf("program->functions\n");}
+program:	 			functions {printf("program-> functions\n");}
 
-functions: 		/*epsilon*/ {printf("functions->epsilon\n");}
-				| function functions {printf("functions->function functions\n");}
+functions: 				/*epsilon*/ {printf("functions-> epsilon\n");}
+						| function functions {printf("functions-> function functions\n");}
 
-function: 		FUNCTION IDENT SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statement SEMICOLON END_BODY
-				{printf("function->FUNCTION IDENT %s SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statement SEMICOLON END_BODY\n", $2);}
+function: 				FUNCTION IDENT SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statements END_BODY
+						{printf("function-> FUNCTION IDENT %s SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statements END_BODY\n", $2);}
 			
-declarations:	/*epsilon*/ {printf("declarations->epsilon\n");}
-				| declaration SEMICOLON declarations {printf("declarations->declaration SEMICOLON declorations\n");}
+declarations:			/*epsilon*/ {printf("declarations-> epsilon\n");}
+						| declaration SEMICOLON declarations {printf("declarations-> declaration SEMICOLON declorations\n");}
 				
-declaration:	IDENT COLON INTEGER {printf("IDENT %s COMMA COLON INTEGER\n"), $1;}
-			
-statement:		var ASSIGN expression {printf("statement->var ASSIGN expression");}
+declaration:			identifier COLON INTEGER {printf("declaration-> identifier COLON INTEGER\n");}
+						| identifier COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER 
+						{printf("declaration-> identifier COLON ARRAY L_SQUARE_BRACKET NUMBER %d R_SQUARE_BRACKET OF INTEGER\n", $5);}
+						| identifier COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER 
+						{printf("declaration-> identifier COLON ARRAY L_SQUARE_BRACKET NUMBER %d R_SQUARE_BRACKET L_SQUARE_BRACKET NUMBER %d R_SQUARE_BRACKET OF INTEGER\n", $5, $8);}
+				
 
-var:			IDENT
-				{printf("var->IDENT %s\n", $1);}
+statements:				statement SEMICOLON statements {printf("statements-> statement SEMICOLON statements\n");}
+						| statement SEMICOLON {printf("statements-> statement SEMICOLON\n");}
+
+
+
+statement:				var ASSIGN expression {printf("statement-> var ASSIGN expression"\n);}
+						| IF bool-expr THEN statements ENDIF {printf("statement-> IF bool-expr THEN statements ENDIF\n");}
+						| IF bool-expr THEN statements ELSE statements ENDIF {printf("statement-> IF bool-expr THEN statements ELSE statements ENDIF\n");}
+						| WHILE bool-expr BEGINLOOP statements ENDLOOP {printf("statement->WHILE bool-expr BEGINLOOP statements ENDLOOP\n");}
+						| DO BEGINLOOP statements ENDLOOP WHILE bool-expr {printf("statement->DO BEGINLOOP statements ENDLOOP WHILE bool-expr");}
+						| FOR var ASSIGN NUMBER SEMICOLON bool-expr SEMICOLON var ASSIGN expression BEGINLOOP statements ENDLOOP {printf("statements-> FOR var ASSIGN NUMBER SEMICOLON bool-expr SEMICOLON var ASSIGN expression BEGINLOOP statements ENDLOOP");}
+/*PICK UP HEREXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+						| READ var
+
+
+var:					IDENT
+						{printf("var->IDENT %s\n", $1);}
 				
-expression:		/*epsilon*/ {printf("expression->epsilon\n");}
+expression:				/*epsilon*/ {printf("expression->epsilon\n");}
 				
+bool-expr:				
+
+relation-and-expr:		
+
+relation-expr:			
+
+comp:					
+
+multiplicative-expr:	
+
+term:					
+				
+identifier:				IDENT {printf("identifier->IDENT %s\n", $1);}
+						| IDENT COMMA identifier {printf("identifier->IDENT %s COMMA identifier", $1);}
 			
 %%
 
