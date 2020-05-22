@@ -1,4 +1,4 @@
-/* CHANGED SOME STUFF BEFORE DEMO MAY NOT RUN PROPER
+/* 
  * Christopher Moreno
  * CS152 Project_Phase_2
  * Description: Parser for the Mini-L language 
@@ -27,17 +27,6 @@
   int iVal;
 }
 
-%left L_PAREN R_PAREN
-%left L_SQUARE_BRACKET R_SQUARE_BRACKET
-
-
-%left MULT DIV MOD 
-
-%left ADD SUB LT LTE GT GTE EQ NEQ 
-%left AND OR
-
-%right ASSIGN NOT
-
 /*tokens, bison makes these constant variables*/
 %token <cVal> IDENT
 %token <iVal> NUMBER
@@ -48,7 +37,11 @@
 %token BEGINLOOP ENDLOOP CONTINUE READ WRITE
 %token COLON COMMA 
 
+%left L_PAREN R_PAREN AND OR
+%left L_SQUARE_BRACKET R_SQUARE_BRACKET
+%left MULT DIV MOD ADD SUB LT LTE GT GTE EQ NEQ 
 
+%right ASSIGN NOT
 
 %error-verbose
 %start program
@@ -81,9 +74,7 @@ functions: 				/*epsilon*/ {printf("functions-> epsilon\n");}
 function: 				FUNCTION identifier SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statements END_BODY
 						{printf("function-> FUNCTION identifier SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statements END_BODY\n");}
 			
-/*declarations:			/*epsilon*/ {printf("declarations-> epsilon\n");}*/
-
-declarations:
+declarations:			/*epsilon*/ {printf("declarations-> epsilon\n");}
 						| declaration SEMICOLON declarations {printf("declarations-> declaration SEMICOLON declorations\n");}
 				
 declaration:			identifier COLON INTEGER {printf("declaration-> identifier COLON INTEGER\n");}
