@@ -1,8 +1,7 @@
-/* 
+/* CHANGED SOME STUFF BEFORE DEMO MAY NOT RUN PROPER
  * Christopher Moreno
- * CS152 Project_Phase_2
- * Description: Parser for the Mini-L language 
- *    
+ * CS152 Project_Phase_3
+ * Description: Code Generator
  *
  * Below is the basic file layout:
  * DEFINTIONS
@@ -11,14 +10,37 @@
  * %%
  * USER CODE
  */
+ 
 %{
  #include <stdio.h>
  #include <stdlib.h>
+ #include "string.h"
+ #include "y.tab.h"
  void yyerror(const char *msg);		/*declaration given by TA*/
  //extern char * identVal;
  extern int cur_line;
  extern int cur_pos;
  FILE * yyin;
+ int yylex();
+ bool no_error = true;
+ int num_temps = 0;
+
+/*
+struct dec_type(
+	string code;
+	list<string> ids;
+)
+
+SYMBOL TABLE EXAMPLE
+map<string, int> symbol_table; // 0 = scalar, 1 = array name, 2 = function name
+
+string make_temps(){
+	string ret = "_temp_" + itoa(num_temps);
+	num_temps++;
+}
+
+*/
+
 %}
 
 /*Used to give tokens a type*/
@@ -26,6 +48,8 @@
   char * cVal;
   int iVal;
 }
+
+
 
 /*tokens, bison makes these constant variables*/
 %token <cVal> IDENT
@@ -37,13 +61,18 @@
 %token BEGINLOOP ENDLOOP CONTINUE READ WRITE
 %token COLON COMMA 
 
-%left L_PAREN R_PAREN AND OR
+%right ASSIGN
+%left OR
+%left AND
+%right NOT
+%left LT LTE GT GTE EQ NEQ 
+%left ADD SUB
+%left MULT DIV MOD 
+%right UMINUS
 %left L_SQUARE_BRACKET R_SQUARE_BRACKET
-%left MULT DIV MOD ADD SUB LT LTE GT GTE EQ NEQ 
+%left L_PAREN R_PAREN
 
-%right ASSIGN NOT
-
-%error-verbose
+%define parse.error verbose
 %start program
 
 /*GRAMMAR
@@ -65,14 +94,19 @@ For EPSILON in one of the production rules we can handle it the
 same way we did with program->functions->function
 */
 
-%%
-program:	 			functions {printf("program-> functions\n");}
+%type <string> functions function
 
-functions: 				/*epsilon*/ {printf("functions-> epsilon\n");}
-						| function functions {printf("functions-> function functions\n");}
+%%
+
+start_func:				functions {if(no_error)printf("%s\n", $1);}
+
+/*program:	 			functions {printf("program-> functions\n");}*/
+
+functions: 				/*epsilon*/ {$$ = "";}
+						| function functions {$$ = $1 + "\n" + $2;}
 
 function: 				FUNCTION identifier SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statements END_BODY
-						{printf("function-> FUNCTION identifier SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statements END_BODY\n");}
+						{$$ = "func " + $2;}
 			
 declarations:			/*epsilon*/ {printf("declarations-> epsilon\n");}
 						| declaration SEMICOLON declarations {printf("declarations-> declaration SEMICOLON declorations\n");}
@@ -84,8 +118,10 @@ declaration:			identifier COLON INTEGER {printf("declaration-> identifier COLON 
 						{printf("declaration-> identifier COLON ARRAY L_SQUARE_BRACKET NUMBER %d R_SQUARE_BRACKET L_SQUARE_BRACKET NUMBER %d R_SQUARE_BRACKET OF INTEGER\n", $5, $8);}
 				
 
-statements:				/*epsilon*/ {printf("statements-> epsilon\n");}
-						| statement SEMICOLON statements {printf("statements-> statement SEMICOLON statements\n");}
+statements:				/*/*epsilon*/ {printf("statements-> epsilon\n");}
+						| */
+						statement SEMICOLON statements {printf("statements-> statement SEMICOLON statements\n");}
+						| statement SEMICOLON {printf("statements-> statement SEMICOLON\n");}
 						/*| statement SEMICOLON {printf("statements-> statement SEMICOLON\n");}*/
 
 
