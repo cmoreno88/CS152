@@ -1,59 +1,61 @@
-/* CHANGED SOME STUFF BEFORE DEMO MAY NOT RUN PROPER
- * Christopher Moreno
- * CS152 Project_Phase_3
- * Description: Code Generator
- *
- * Below is the basic file layout:
- * DEFINTIONS
- * %%
- * GRAMMAR
- * %%
- * USER CODE
- */
- 
 %{
- #include <stdio.h>
- #include <stdlib.h>
- #include "string.h"
- #include "y.tab.h"
- void yyerror(const char *msg);		/*declaration given by TA*/
- //extern char * identVal;
- extern int cur_line;
- extern int cur_pos;
- FILE * yyin;
- int yylex();
- bool no_error = true;
- int num_temps = 0;
-
-/*
-struct dec_type(
-	string code;
-	list<string> ids;
-)
-
-SYMBOL TABLE EXAMPLE
-map<string, int> symbol_table; // 0 = scalar, 1 = array name, 2 = function name
-
-string make_temps(){
-	string ret = "_temp_" + itoa(num_temps);
-	num_temps++;
-}
-
-*/
-
 %}
 
-/*Used to give tokens a type*/
-%union{
-  char * cVal;
-  int iVal;
+%skeleton "lalr1.cc"
+%require "3.0.4"
+%defines
+%define api.token.constructor
+%define api.value.type variant
+%define parse.error verbose
+%locations
+
+%code requires
+{
+	/* you may need these header files 
+	 * add more header file if you need more
+	 */
+#include <list>
+#include <string>
+#include <functional>
+using namespace std;
+	/* define the sturctures using as types for non-terminals */
+
+	/* end the structures for non-terminal types */
 }
 
 
+%code
+{
+#include "parser.tab.hh"
 
-/*tokens, bison makes these constant variables*/
-%token <cVal> IDENT
-%token <iVal> NUMBER
+	/* you may need these header files 
+	 * add more header file if you need more
+	 */
+#include <sstream>
+#include <map>
+#include <regex>
+#include <set>
+yy::parser::symbol_type yylex();
+void yyerror(const char *msg);		/*declaration given by TA*/
+bool no_error = true;
+
+	/* define your symbol table, global variables,
+	 * list of keywords or any function you may need here */
+	
+	/* end of your code */
+}
+
+
+/*Used to give tokens a type*/
+/* specify tokens, type of non-terminals and terminals here
+* end of token specifications
+* tokens, bison makes these constant variables
+*/
+
+%token END 0 "end of file";
+
+%token <string> IDENT
+%token <int> NUMBER
 %token FUNCTION SEMICOLON TRUE FALSE RETURN
 %token BEGIN_PARAMS END_PARAMS BEGIN_LOCALS
 %token END_LOCALS BEGIN_BODY END_BODY INTEGER
@@ -72,41 +74,21 @@ string make_temps(){
 %left L_SQUARE_BRACKET R_SQUARE_BRACKET
 %left L_PAREN R_PAREN
 
-%define parse.error verbose
-%start program
 
-/*GRAMMAR
-Some productions from the chart need 
-to be split up into terminal and 
-Non-Terminal versions like function
-Psuedo variables:
-$$ : $1 $2 $3 etc
-THIS is an example of calling yyerror
-exp:		NUMBER                { $$ = $1; }
-			| exp PLUS exp        { $$ = $1 + $3; }
-			| exp MINUS exp       { $$ = $1 - $3; }
-			| exp MULT exp        { $$ = $1 * $3; }
-			| exp DIV exp         { if ($3==0) yyerror("divide by zero"); else $$ = $1 / $3; }
-			| MINUS exp %prec UMINUS { $$ = -$2; }
-			| L_PAREN exp R_PAREN { $$ = $2; }
-			;
-For EPSILON in one of the production rules we can handle it the
-same way we did with program->functions->function
-*/
+%start start_func
 
 %type <string> functions function
 
+/*start_func:				functions {if (no_error) printf("%s\n", $1);}*/
 %%
 
-start_func:				functions {if(no_error)printf("%s\n", $1);}
-
-/*program:	 			functions {printf("program-> functions\n");}*/
+start_func:				functions {if (no_error) cout<< $1 <<endl;}
 
 functions: 				/*epsilon*/ {$$ = "";}
 						| function functions {$$ = $1 + "\n" + $2;}
 
 function: 				FUNCTION identifier SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statements END_BODY
-						{$$ = "func " + $2;}
+						{printf("function-> LONG FUNCTION GRAMMAR identifier COLON INTEGER\n");}
 			
 declarations:			/*epsilon*/ {printf("declarations-> epsilon\n");}
 						| declaration SEMICOLON declarations {printf("declarations-> declaration SEMICOLON declorations\n");}
@@ -118,11 +100,9 @@ declaration:			identifier COLON INTEGER {printf("declaration-> identifier COLON 
 						{printf("declaration-> identifier COLON ARRAY L_SQUARE_BRACKET NUMBER %d R_SQUARE_BRACKET L_SQUARE_BRACKET NUMBER %d R_SQUARE_BRACKET OF INTEGER\n", $5, $8);}
 				
 
-statements:				/*/*epsilon*/ {printf("statements-> epsilon\n");}
-						| */
-						statement SEMICOLON statements {printf("statements-> statement SEMICOLON statements\n");}
+						/*epsilon {printf("statements-> epsilon\n");}|*/
+statements:				statement SEMICOLON statements {printf("statements-> statement SEMICOLON statements\n");}
 						| statement SEMICOLON {printf("statements-> statement SEMICOLON\n");}
-						/*| statement SEMICOLON {printf("statements-> statement SEMICOLON\n");}*/
 
 
 
@@ -194,28 +174,13 @@ identifier:				IDENT {printf("identifier-> IDENT %s\n", $1);}
 			
 %%
 
-
-/* %d is for digit in C*/
-
-int main(int argc, char ** argv)
+int main(int argc, char *argv[])
 {
-	if(argc >= 2)
-	{
-		yyin = fopen(argv[1], "r");
-		if(yyin == NULL)
-		{
-			yyin = stdin;
-		}
-	}
-	else
-	{
-		yyin = stdin;
-	}
-	yyparse();			// calls yylex()
-	
-	return 1;
+	yy::parser p;
+	return p.parse();
 }
 
-void yyerror(const char *msg) {
-   printf("** Line %d, position %d: %s\n", cur_line, cur_pos, msg);
+void yy::parser::error(const yy::location& l, const std::string& m)
+{
+	std::cerr << l << ": " << m << std::endl;
 }
