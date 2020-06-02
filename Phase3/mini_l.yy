@@ -19,7 +19,10 @@
 #include <functional>
 using namespace std;
 	/* define the sturctures using as types for non-terminals */
-
+struct dec_type {
+	string code;
+	list <string> ids;
+}
 	/* end the structures for non-terminal types */
 }
 
@@ -38,11 +41,19 @@ using namespace std;
 yy::parser::symbol_type yylex();
 void yyerror(const char *msg);		/*declaration given by TA*/
 bool no_error = true;
+int num_temps = 0;
 
 	/* define your symbol table, global variables,
 	 * list of keywords or any function you may need here */
 	
 	/* end of your code */
+
+string make_temps(){
+	string ret = "_temp_" + itoa(num_temps);
+	num_temps++;
+}
+	
+map <string, int> symbol_table;
 }
 
 
@@ -52,8 +63,8 @@ bool no_error = true;
 * tokens, bison makes these constant variables
 */
 
-%token END 0 "end of file";
 
+%token END 0 "end of file";
 %token <string> IDENT
 %token <int> NUMBER
 %token FUNCTION SEMICOLON TRUE FALSE RETURN
@@ -62,7 +73,6 @@ bool no_error = true;
 %token ARRAY OF IF THEN ENDIF ELSE WHILE DO FOR
 %token BEGINLOOP ENDLOOP CONTINUE READ WRITE
 %token COLON COMMA 
-
 %right ASSIGN
 %left OR
 %left AND
@@ -74,21 +84,22 @@ bool no_error = true;
 %left L_SQUARE_BRACKET R_SQUARE_BRACKET
 %left L_PAREN R_PAREN
 
-
 %start start_func
+%type <string> functions function declarations declaration
+%type <dec_type>
 
-%type <string> functions function
-
-/*start_func:				functions {if (no_error) printf("%s\n", $1);}*/
 %%
 
-start_func:				functions {if (no_error) cout<< $1 <<endl;}
+start_func:				functions {if (no_error) cout << $1 << endl;}
 
 functions: 				/*epsilon*/ {$$ = "";}
 						| function functions {$$ = $1 + "\n" + $2;}
 
 function: 				FUNCTION identifier SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statements END_BODY
-						{printf("function-> LONG FUNCTION GRAMMAR identifier COLON INTEGER\n");}
+						{$$ = "func " + $2 + "\n";
+						 $$ = 
+						 $$ += "endfunc" ; 
+						}
 			
 declarations:			/*epsilon*/ {printf("declarations-> epsilon\n");}
 						| declaration SEMICOLON declarations {printf("declarations-> declaration SEMICOLON declorations\n");}
@@ -100,7 +111,6 @@ declaration:			identifier COLON INTEGER {printf("declaration-> identifier COLON 
 						{printf("declaration-> identifier COLON ARRAY L_SQUARE_BRACKET NUMBER %d R_SQUARE_BRACKET L_SQUARE_BRACKET NUMBER %d R_SQUARE_BRACKET OF INTEGER\n", $5, $8);}
 				
 
-						/*epsilon {printf("statements-> epsilon\n");}|*/
 statements:				statement SEMICOLON statements {printf("statements-> statement SEMICOLON statements\n");}
 						| statement SEMICOLON {printf("statements-> statement SEMICOLON\n");}
 
@@ -169,8 +179,8 @@ term:					var {printf("term->vars\n");}
 						| SUB L_PAREN expression R_PAREN {printf("term-> SUB L_PAREN expression R_PAREN\n");}
 						| identifier L_PAREN expressions R_PAREN {printf("term-> identifier L_PAREN expressions R_PAREN\n");}
 						
-identifier:				IDENT {printf("identifier-> IDENT %s\n", $1);}
-						| IDENT COMMA identifier {printf("identifier-> IDENT %s COMMA identifier\n", $1);}
+identifier:				IDENT {cout<< "identifier-> IDENT " << $1 << endl;}
+						| IDENT COMMA identifier {cout << "identifier-> IDENT " << $1 << " COMMA identifier" << endl;}
 			
 %%
 

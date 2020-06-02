@@ -19,6 +19,7 @@
 
 %{
 #include<iostream>
+#define YY_DECL yy::parser::symbol_type yylex()
 #include <string>
 #include "parser.tab.hh"
 
