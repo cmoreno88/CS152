@@ -11,21 +11,18 @@
 
 %code requires
 {
-	/* you may need these header files 
-	 * add more header file if you need more
-	 */
+/* you may need these header files, add more header file if you need more*/
 #include <list>
 #include <string>
 #include <functional>
 using namespace std;
 	
-	/* define the sturctures using as types for non-terminals */
-
-struct dec_type {
+/* define the sturctures using as types for non-terminals */
+struct gen_type {
 	string code;
 	list <string> ids;
 	};
-		/* end the structures for non-terminal types */
+/* end the structures for non-terminal types */
 }
 
 
@@ -50,18 +47,17 @@ struct dec_type {
 	
 		/* end of your code */
 
-	string make_temps(){
-		string ret = "_temp_" + std:itoa(num_temps);
+	/*string make_temps(){
+		string ret = "_temp_" + std::itoa(num_temps);
 		num_temps++;
-	}
-	map <string, int> symbol_table;
+	}*/
+//	map <string, int> symbol_table;
 }
 
 
 /*Used to give tokens a type*/
 /* specify tokens, type of non-terminals and terminals here
-* end of token specifications
-* tokens, bison makes these constant variables
+*  end of token specifications, tokens, bison makes these constant variables
 */
 
 
@@ -86,8 +82,8 @@ struct dec_type {
 %left L_PAREN R_PAREN
 
 %start start_func
-%type <string> functions function declarations declaration
-%type <dec_type> identifier
+%type <string> functions function declaration
+%type <gen_type> identifier statements declarations
 
 %%
 
@@ -97,9 +93,11 @@ functions: 				/*epsilon*/ {$$ = "";}
 						| function functions {$$ = $1 + "\n" + $2;}
 
 function: 				FUNCTION identifier SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statements END_BODY
-						{$$ = "func " + $2 + "\n";
-						 $$ = 
-						 $$ += "endfunc" ; 
+						{$$ = "func " + $2.code + "\n";
+						 $$ += $5.code + "\n";
+						 $$ += $8.code + "\n";
+						 $$ += $11.code + "\n";
+						 $$ += "endfunc"; 
 						}
 			
 declarations:			/*epsilon*/ {printf("declarations-> epsilon\n");}
