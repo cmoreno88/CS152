@@ -18,42 +18,43 @@
 #include <string>
 #include <functional>
 using namespace std;
+	
 	/* define the sturctures using as types for non-terminals */
+
 struct dec_type {
 	string code;
 	list <string> ids;
-}
-	/* end the structures for non-terminal types */
+	};
+		/* end the structures for non-terminal types */
 }
 
 
 %code
 {
-#include "parser.tab.hh"
+	#include "parser.tab.hh"
 
 	/* you may need these header files 
 	 * add more header file if you need more
 	 */
-#include <sstream>
-#include <map>
-#include <regex>
-#include <set>
-yy::parser::symbol_type yylex();
-void yyerror(const char *msg);		/*declaration given by TA*/
-bool no_error = true;
-int num_temps = 0;
+	#include <sstream>
+	#include <map>
+	#include <regex>
+	#include <set> 
+	yy::parser::symbol_type yylex();
+	void yyerror(const char *msg);		/*declaration given by TA*/
+	bool no_error = true;
+	int num_temps = 0;
 
-	/* define your symbol table, global variables,
-	 * list of keywords or any function you may need here */
+		/* define your symbol table, global variables,
+		* list of keywords or any function you may need here */
 	
-	/* end of your code */
+		/* end of your code */
 
-string make_temps(){
-	string ret = "_temp_" + itoa(num_temps);
-	num_temps++;
-}
-	
-map <string, int> symbol_table;
+	string make_temps(){
+		string ret = "_temp_" + std:itoa(num_temps);
+		num_temps++;
+	}
+	map <string, int> symbol_table;
 }
 
 
@@ -86,7 +87,7 @@ map <string, int> symbol_table;
 
 %start start_func
 %type <string> functions function declarations declaration
-%type <dec_type>
+%type <dec_type> identifier
 
 %%
 
@@ -180,8 +181,8 @@ term:					var {printf("term->vars\n");}
 						| identifier L_PAREN expressions R_PAREN {printf("term-> identifier L_PAREN expressions R_PAREN\n");}
 						
 identifier:				IDENT {cout<< "identifier-> IDENT " << $1 << endl;}
-						| IDENT COMMA identifier {cout << "identifier-> IDENT " << $1 << " COMMA identifier" << endl;}
-			
+						| IDENT COMMA identifier {cout << "identifier-> IDENT " << $1 << " COMMA identifier" << endl;}		
+
 %%
 
 int main(int argc, char *argv[])
