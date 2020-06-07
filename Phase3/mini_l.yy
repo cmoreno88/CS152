@@ -13,7 +13,9 @@
 {
 /* you may need these header files, add more header file if you need more*/
 #include <list>
+#include <fstream>
 #include <string>
+#include <cstring>
 #include <functional>
 using namespace std;
 	
@@ -39,7 +41,8 @@ struct gen_type {
 	#include <set> 
 	yy::parser::symbol_type yylex();
 	void yyerror(const char *msg);		/*declaration given by TA*/
-	bool no_error = true;
+	bool no_error = true;				// Set when an error occurs
+	string pgmName;				// Holds function name
 	int num_temps = 0;
 
 		/* define your symbol table, global variables,
@@ -87,23 +90,39 @@ struct gen_type {
 
 %%
 
-start_func:				functions {if (no_error) cout << $1 << endl;}
-
+start_func:				functions 
+						{
+							if (no_error)
+							{
+								ofstream out_Handler;
+								out_Handler.open(pgmName.c_str(), fstream::out);
+								out_Handler << $1;
+								out_Handler.close();
+							}
+						}
+						/*Your input from *.min and output to *.mil happen here*/
+						
 functions: 				/*epsilon*/ {$$ = "";}
 						| function functions {$$ = $1 + "\n" + $2;}
 
 function: 				FUNCTION identifier SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statements END_BODY
-						{$$ = "func " + $2.code + "\n";
-						 $$ += $5.code + "\n";
-						 $$ += $8.code + "\n";
-						 $$ += $11.code + "\n";
-						 $$ += "endfunc"; 
+						{	
+							pgmName.append($2.code);
+							pgmName.append(".mil");
+							$$ = "func " + $2.code + "\n";
+							$$ += $5.code + "\n";
+							$$ += $8.code + "\n";
+							$$ += $11.code + "\n";
+							$$ += "endfunc"; 
 						}
 			
 declarations:			/*epsilon*/ {printf("declarations-> epsilon\n");}
 						| declaration SEMICOLON declarations {printf("declarations-> declaration SEMICOLON declorations\n");}
 				
-declaration:			identifier COLON INTEGER {printf("declaration-> identifier COLON INTEGER\n");}
+declaration:			identifier COLON INTEGER 
+						{
+							$$ = $1.code + "\n";
+						}
 						| identifier COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER 
 						{printf("declaration-> identifier COLON ARRAY L_SQUARE_BRACKET NUMBER %d R_SQUARE_BRACKET OF INTEGER\n", $5);}
 						| identifier COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER 
@@ -178,7 +197,7 @@ term:					var {printf("term->vars\n");}
 						| SUB L_PAREN expression R_PAREN {printf("term-> SUB L_PAREN expression R_PAREN\n");}
 						| identifier L_PAREN expressions R_PAREN {printf("term-> identifier L_PAREN expressions R_PAREN\n");}
 						
-identifier:				IDENT {cout<< "identifier-> IDENT " << $1 << endl;}
+identifier:				IDENT {$$.code.assign($1);}
 						| IDENT COMMA identifier {cout << "identifier-> IDENT " << $1 << " COMMA identifier" << endl;}		
 
 %%
