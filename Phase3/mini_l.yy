@@ -22,6 +22,7 @@ using namespace std;
 /* define the sturctures using as types for non-terminals */
 struct gen_type {
 	string code;
+	string place;
 	list <string> ids;
 	};
 /* end the structures for non-terminal types */
@@ -44,16 +45,19 @@ struct gen_type {
 	bool no_error = true;				// Set when an error occurs
 	string pgmName;				// Holds function name
 	int num_temps = 0;
+	string empty = "";
 
 		/* define your symbol table, global variables,
 		* list of keywords or any function you may need here */
 	
 		/* end of your code */
 
-	/*string make_temps(){
-		string ret = "_temp_" + std::itoa(num_temps);
+	//temporary labels for generating code
+	string make_temps(){
+		string ret = "_temp_" + to_string(num_temps);
 		num_temps++;
-	}*/
+		return ret;
+	}
 //	map <string, int> symbol_table;
 }
 
@@ -85,8 +89,8 @@ struct gen_type {
 %left L_PAREN R_PAREN
 
 %start start_func
-%type <string> functions function declaration
-%type <gen_type> identifier statements declarations
+%type <string> functions function LT LTE GT GTE EQ NEQ comp
+%type <gen_type> identifier statements declarations declaration
 
 %%
 
@@ -113,15 +117,19 @@ function: 				FUNCTION identifier SEMICOLON BEGIN_PARAMS declarations END_PARAMS
 							$$ += $5.code + "\n";
 							$$ += $8.code + "\n";
 							$$ += $11.code + "\n";
-							$$ += "endfunc"; 
+							$$ += "endfunc";
 						}
 			
-declarations:			/*epsilon*/ {printf("declarations-> epsilon\n");}
-						| declaration SEMICOLON declarations {printf("declarations-> declaration SEMICOLON declorations\n");}
+declarations:			/*epsilon*/ {$$.code = "";}
+						| declaration SEMICOLON declarations 
+						{
+							$$.code = $1.code + "\n";
+							$$.code += $3.code + "\n";
+						}
 				
 declaration:			identifier COLON INTEGER 
 						{
-							$$ = $1.code + "\n";
+							$$.code = $1.code + "\n";
 						}
 						| identifier COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER 
 						{printf("declaration-> identifier COLON ARRAY L_SQUARE_BRACKET NUMBER %d R_SQUARE_BRACKET OF INTEGER\n", $5);}
@@ -152,12 +160,12 @@ var:					identifier {printf("var-> identifier\n");}
 						| identifier L_SQUARE_BRACKET expressions R_SQUARE_BRACKET {printf("var-> identifier L_SQUARE_BRACKET expressions R_SQUARE_BRACKET\n");}
 						| identifier L_SQUARE_BRACKET expressions R_SQUARE_BRACKET L_SQUARE_BRACKET expressions R_SQUARE_BRACKET {printf("var-> identifier L_SQUARE_BRACKET expressions R_SQUARE_BRACKET L_SQUARE_BRACKET expressions R_SQUARE_BRACKET\n");}
 
-comp:					EQ {printf("comp-> EQ\n");}
-						| NEQ {printf("comp-> NEQ\n");}
-						| LT {printf("comp-> LT\n");}
-						| GT {printf("comp-> GT\n");}
-						| LTE {printf("comp-> LTE\n");}
-						| GTE {printf("comp-> GTE\n");}
+comp:					EQ {$$ = $1;}
+						| NEQ {$$ = $1;}
+						| LT {$$ = $1;}
+						| GT {$$ = $1;}
+						| LTE {$$ = $1;}
+						| GTE {$$ = $1;}
 
 expressions:			/*epsilon*/ {printf("expressions-> epsilon\n");}
 						| expression {printf("expressions-> expression\n");}
@@ -197,7 +205,7 @@ term:					var {printf("term->vars\n");}
 						| SUB L_PAREN expression R_PAREN {printf("term-> SUB L_PAREN expression R_PAREN\n");}
 						| identifier L_PAREN expressions R_PAREN {printf("term-> identifier L_PAREN expressions R_PAREN\n");}
 						
-identifier:				IDENT {$$.code.assign($1);}
+identifier:				IDENT {$$.code.assign($1);}	//assign() sets the IDENT string value
 						| IDENT COMMA identifier {cout << "identifier-> IDENT " << $1 << " COMMA identifier" << endl;}		
 
 %%
