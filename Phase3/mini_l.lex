@@ -76,11 +76,11 @@ loc.step();
 "false"				{cur_pos += yyleng; return yy::parser::make_FALSE(loc);}
 "return"			{cur_pos += yyleng; return yy::parser::make_RETURN(loc);}
 
-"-"					{cur_pos += yyleng; return yy::parser::make_SUB(loc);}
-"+"					{cur_pos += yyleng; return yy::parser::make_ADD(loc);}
-"*"					{cur_pos += yyleng; return yy::parser::make_MULT(loc);}
-"/"					{cur_pos += yyleng; return yy::parser::make_DIV(loc);}
-"%"					{cur_pos += yyleng; return yy::parser::make_MOD(loc);}
+"-"					{cur_pos += yyleng; return yy::parser::make_SUB("-", loc);}
+"+"					{cur_pos += yyleng; return yy::parser::make_ADD("+", loc);}
+"*"					{cur_pos += yyleng; return yy::parser::make_MULT("*", loc);}
+"/"					{cur_pos += yyleng; return yy::parser::make_DIV("/", loc);}
+"%"					{cur_pos += yyleng; return yy::parser::make_MOD("%", loc);}
 "=="				{cur_pos += yyleng; return yy::parser::make_EQ("==", loc);}
 "<>"				{cur_pos += yyleng; return yy::parser::make_NEQ("<>", loc);}
 "<"					{cur_pos += yyleng; return yy::parser::make_LT("<", loc);}

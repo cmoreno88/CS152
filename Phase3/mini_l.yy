@@ -91,8 +91,8 @@ struct gen_type {
 %token <int> NUMBER
 
 %start start_func
-%type <string> functions function LT LTE GT GTE EQ NEQ comp
-%type <gen_type> identifier statements declarations declaration expressions expression var vars
+%type <string> functions function LT LTE GT GTE EQ NEQ comp SUB ADD MULT DIV MOD
+%type <gen_type> identifier statements declarations declaration expressions expression var vars statement term multiplicative-expr
 
 %%
 
@@ -302,48 +302,48 @@ relation-expr:			expression comp expression
 
 multiplicative-expr:	term
 						{
-							printf("multiplicative-expr-> term\n");
+							$$.code = $1.code;
 						}
 						| term MULT multiplicative-expr
 						{
-							printf("multiplicative-expr-> term MULT multiplicative-expr\n");
+							$$.code = $1.code + $2 + $3.code;
 						}
 						| term DIV multiplicative-expr
 						{
-							printf("multiplicative-expr-> term DIV multiplicative-expr\n");
+							$$.code = $1.code + $2 + $3.code;
 						}
 						| term MOD multiplicative-expr
 						{
-							printf("multiplicative-expr-> term MOD multiplicative-expr\n");
+							$$.code = $1.code + $2 + $3.code;
 						}
 
 term:					var
 						{
-							printf("term->vars\n");
+							$$.code = $1.code;
 						}
 						| SUB var
 						{
-							printf("term-> SUB vars\n");
+							$$.code = $1 + $2.code;
 						}
 						| NUMBER
 						{
-							printf("term-> NUMBER %d\n", $1);
+							$$.code = to_string($1);
 						}
 						| SUB NUMBER
 						{
-							printf("term-> SUB NUMBER %d\n", $2);
+							$$.code = $1 + to_string($2);
 						}
 						| L_PAREN expression R_PAREN
 						{
-							printf("term-> L_PAREN expression R_PAREN\n");
+							$$.code = "(" + $2.code + ")";
 						}
 						| SUB L_PAREN expression R_PAREN 
 						{
-							printf("term-> SUB L_PAREN expression R_PAREN\n");
+							$$.code = $1 + "(" + $3.code + ")";
 						}
 						| identifier L_PAREN expressions R_PAREN
 						{
-							printf("term-> identifier L_PAREN expressions R_PAREN\n");
+							$$.code = $1.code + "(" + $3.code + ")";
 						}
 						
 identifier:				IDENT {$$.code = $1;}	//{$$.code.assign($1);}assign() sets the IDENT string value
