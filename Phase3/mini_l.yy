@@ -92,7 +92,7 @@ struct gen_type {
 
 %start start_func
 %type <string> functions function LT LTE GT GTE EQ NEQ comp SUB ADD MULT DIV MOD
-%type <gen_type> identifier statements declarations declaration expressions expression var vars statement term multiplicative-expr
+%type <gen_type> identifier statements declarations declaration expressions expression var vars statement term multiplicative-expr relation-and-expr relation-expr
 
 %%
 
@@ -236,15 +236,15 @@ expressions:			/*epsilon*/ {$$.code = "";}
 				
 expression:				multiplicative-expr
 						{
-							printf("expression-> multiplicative-expr\n");
+							$$.code = $1.code;
 						}
 						| multiplicative-expr ADD expression
 						{
-							printf("expression-> multiplicative-expr ADD expression\n");
+							$$.code = $1.code + $2 + $3.code;
 						}
 						| multiplicative-expr SUB expression
 						{
-							printf("expression-> multiplicative-expr SUB expression\n");
+							$$.code = $1.code + $2 + $3.code;
 						}
 
 				
